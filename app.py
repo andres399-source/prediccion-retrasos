@@ -33,18 +33,23 @@ if submit:
         'Product_importance': [importancia]
     })
     
+    # Preprocesamiento (One-Hot Encoding)
     datos_proc = pd.get_dummies(datos, drop_first=True)
     
-    columnas_esperadas = ['Weight_in_gms', 'Distance_km', 'Cost_of_the_Product', 
-                          'Prior_purchases', 'Mode_of_Shipment_Vuelo',
-                          'Product_importance_Baja', 'Product_importance_Media']
+    # Definir TODAS las columnas que el modelo espera (las 7 del entrenamiento)
+    columnas_entrenamiento = ['Weight_in_gms', 'Distance_km', 'Cost_of_the_Product', 
+                              'Prior_purchases', 'Mode_of_Shipment_Vuelo',
+                              'Product_importance_Baja', 'Product_importance_Media']
     
-    for col in columnas_esperadas:
+    # Asegurar que existan todas las columnas (si falta alguna, se crea con 0)
+    for col in columnas_entrenamiento:
         if col not in datos_proc.columns:
             datos_proc[col] = 0
     
-    datos_proc = datos_proc[columnas_esperadas]
+    # Reordenar las columnas para que coincidan con el entrenamiento
+    datos_proc = datos_proc[columnas_entrenamiento]
     
+    # Hacer la predicción
     prediccion = modelo.predict(datos_proc.values)
     
     st.write(f"**Probabilidad de retraso:** {prediccion[0][0]*100:.2f}%")
