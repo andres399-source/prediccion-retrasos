@@ -24,6 +24,12 @@ with st.form("formulario"):
     submit = st.form_submit_button("Predecir")
 
 if submit:
+    import json
+    
+    # Cargar el orden exacto de las columnas del entrenamiento
+    with open('columnas_modelo.json', 'r') as f:
+        columnas_entrenamiento = json.load(f)
+    
     datos = pd.DataFrame({
         'Weight_in_gms': [peso],
         'Distance_km': [distancia],
@@ -36,17 +42,12 @@ if submit:
     # Preprocesamiento (One-Hot Encoding)
     datos_proc = pd.get_dummies(datos, drop_first=True)
     
-    # Definir TODAS las columnas que el modelo espera (las 7 del entrenamiento)
-    columnas_entrenamiento = ['Weight_in_gms', 'Distance_km', 'Cost_of_the_Product', 
-                              'Prior_purchases', 'Mode_of_Shipment_Vuelo',
-                              'Product_importance_Baja', 'Product_importance_Media']
-    
-    # Asegurar que existan todas las columnas (si falta alguna, se crea con 0)
+    # Asegurar que existan TODAS las columnas del entrenamiento
     for col in columnas_entrenamiento:
         if col not in datos_proc.columns:
             datos_proc[col] = 0
     
-    # Reordenar las columnas para que coincidan con el entrenamiento
+    # Reordenar las columnas EXACTAMENTE como en el entrenamiento
     datos_proc = datos_proc[columnas_entrenamiento]
     
     # Hacer la predicción
